@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales &amp; Calculation Process — RACI</title>
+<style>
+  :root{
+    --navy:#0f1f3d; --navy2:#1f3864; --teal:#19c3b2; --teal2:#0e9b8e;
+    --gold:#f5b942; --ink:#0b1424; --paper:#ffffff; --mist:#eef2f8;
+    --r:#1f9d55; --a:#c0392b; --c:#2d6cdf; --i:#7a7f8a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#0a1220;color:var(--ink);font-family:"Segoe UI",-apple-system,Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  .deck{display:flex;flex-direction:column;align-items:center;gap:26px;padding:32px 16px}
+
+  .slide{
+    position:relative;width:1180px;max-width:98vw;aspect-ratio:16/9;
+    background:var(--paper);border-radius:20px;overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,.45);
+    display:flex;flex-direction:column;
+  }
+
+  /* ---------- shared chrome ---------- */
+  .bar{height:8px;background:linear-gradient(90deg,var(--teal),var(--navy2) 60%,var(--gold))}
+  .pad{padding:46px 58px;flex:1;display:flex;flex-direction:column;min-height:0}
+  .kicker{display:inline-flex;align-items:center;gap:9px;font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--teal2)}
+  .kicker::before{content:"";width:26px;height:3px;border-radius:3px;background:var(--teal)}
+  h1{font-size:46px;line-height:1.05;color:var(--navy);margin:14px 0 6px;font-weight:800;letter-spacing:-.5px}
+  h2{font-size:34px;color:var(--navy);font-weight:800;letter-spacing:-.3px}
+  .sub{font-size:18px;color:#445}
+  .foot{position:absolute;bottom:18px;left:58px;right:58px;display:flex;justify-content:space-between;font-size:12px;color:#9aa3b2;letter-spacing:.04em}
+  .pagepill{font-weight:700;color:var(--navy2)}
+
+  /* ---------- slide 1 ---------- */
+  .s1{background:radial-gradient(1200px 600px at 80% -10%,rgba(25,195,178,.18),transparent 60%),
+              radial-gradient(900px 500px at -10% 110%,rgba(31,56,100,.18),transparent 55%),var(--paper)}
+  .hero{display:grid;grid-template-columns:1.25fr .9fr;gap:34px;flex:1;align-items:center}
+  .lead p{font-size:17px;color:#3a4658;margin-top:14px;line-height:1.55;max-width:560px}
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:26px;max-width:520px}
+  .stat{background:var(--mist);border:1px solid #e2e8f2;border-radius:14px;padding:16px 18px}
+  .stat .n{font-size:34px;font-weight:800;color:var(--navy);line-height:1}
+  .stat .l{font-size:13px;color:#5a6678;margin-top:6px;font-weight:600}
+  .badge{position:absolute;top:30px;right:34px;background:var(--gold);color:#3a2a00;font-weight:800;font-size:12px;letter-spacing:.08em;padding:7px 14px;border-radius:999px;text-transform:uppercase}
+  .panel{background:linear-gradient(160deg,var(--navy),var(--navy2));border-radius:18px;padding:26px;color:#dfe7f5;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+  .panel h3{font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
+  .deliv{display:flex;gap:12px;align-items:flex-start;margin:13px 0;font-size:15px;line-height:1.4}
+  .dot{flex:none;width:11px;height:11px;border-radius:50%;margin-top:5px;background:var(--teal);box-shadow:0 0 0 4px rgba(25,195,178,.18)}
+  .deliv b{color:#fff}
+
+  /* ---------- slide 2 : pipeline ---------- */
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0 14px}
+  .lg{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:#445}
+  .sw{width:13px;height:13px;border-radius:4px}
+  .pipe{flex:1;display:grid;grid-template-columns:repeat(6,1fr);gap:10px;align-content:center}
+  .node{position:relative;border-radius:12px;padding:11px 12px 12px;background:var(--mist);border:1px solid #e1e7f1;min-height:84px;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+  .node::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--teal)}
+  .node .idx{font-size:11px;font-weight:800;color:#9aa6ba}
+  .node .nm{font-size:14px;font-weight:700;color:var(--navy);line-height:1.12}
+  .node .raci{display:flex;gap:5px;margin-top:auto}
+  .tag{font-size:10px;font-weight:800;color:#fff;border-radius:5px;padding:2px 6px;letter-spacing:.03em}
+  .R{background:var(--r)} .A{background:var(--a)} .C{background:var(--c)} .I{background:var(--i)}
+  .phase{grid-column:1/-1;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--teal2);margin-top:4px;display:flex;align-items:center;gap:10px}
+  .phase::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,#d7e0ee,transparent)}
+
+  /* ---------- slide 3 ---------- */
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;flex:1;align-content:start;margin-top:8px}
+  .card{background:var(--paper);border:1px solid #e3e9f3;border-radius:16px;padding:20px;box-shadow:0 8px 22px rgba(20,40,80,.06)}
+  .card h4{font-size:16px;color:var(--navy);font-weight:800;display:flex;align-items:center;gap:9px;margin-bottom:12px}
+  .ic{width:30px;height:30px;border-radius:9px;background:linear-gradient(150deg,var(--teal),var(--teal2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;flex:none}
+  .card ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+  .card li{font-size:13.5px;color:#3c4860;line-height:1.4;padding-left:18px;position:relative}
+  .card li::before{content:"›";position:absolute;left:2px;color:var(--teal2);font-weight:800}
+  .ribbon{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px}
+  .rb{background:linear-gradient(160deg,var(--navy),var(--navy2));border-radius:14px;padding:16px;color:#e7eefb}
+  .rb .n{font-size:24px;font-weight:800;color:#fff}
+  .rb .l{font-size:12px;color:#aebbd6;margin-top:4px}
+
+  @media print{
+    html,body{background:#fff}
+    .deck{gap:0;padding:0}
+    .slide{box-shadow:none;border-radius:0;width:100%;max-width:100%;page-break-after:always;aspect-ratio:auto;height:100vh}
+  }
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- ===================== SLIDE 1 ===================== -->
+  <section class="slide s1">
+    <div class="bar"></div>
+    <span class="badge">Status: TBD · Draft</span>
+    <div class="pad">
+      <span class="kicker">Quality Management · Prozessbeschreibung</span>
+      <div class="hero">
+        <div class="lead">
+          <h1>Sales &amp; Calculation<br>Process</h1>
+          <div class="sub">RACI / Stakeholder-Matrix — zweisprachige Prozess- &amp; Arbeitsanweisung</div>
+          <p>Die handschriftliche RACI-Matrix wurde in ein prüffähiges QM-Dokument überführt:
+             18 Prozessschritte, klare Verantwortlichkeiten und Schnittstellen — verständlich
+             auch für Dritte, durchgängig auf Deutsch und Englisch.</p>
+          <div class="stats">
+            <div class="stat"><div class="n">18</div><div class="l">Prozessschritte</div></div>
+            <div class="stat"><div class="n">17</div><div class="l">Rollen / Stakeholder</div></div>
+            <div class="stat"><div class="n">DE&nbsp;/&nbsp;EN</div><div class="l">Zweisprachig</div></div>
+            <div class="stat"><div class="n">R A C I</div><div class="l">je Schritt zugeordnet</div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Ergebnis / Deliverables</h3>
+          <div class="deliv"><span class="dot"></span><span><b>Prozessbeschreibung</b> — 18 Schritte mit Zweck, Ablauf &amp; RACI</span></div>
+          <div class="deliv"><span class="dot"></span><span><b>Glossar</b> — Rollen, Tools, Begriffe, Zeitkonvention</span></div>
+          <div class="deliv"><span class="dot"></span><span><b>Governance</b> — DoA-Schwellen, MBE, Prime Revenue, 4-Augen</span></div>
+          <div class="deliv"><span class="dot"></span><span><b>Word &amp; Markdown</b> — teilbar neben der Excel-Matrix</span></div>
+        </div>
+      </div>
+      <div class="foot">
+        <span>Installation Systems · Vertriebs- &amp; Kalkulationsprozess</span>
+        <span class="pagepill">01 / 03</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 2 ===================== -->
+  <section class="slide">
+    <div class="bar"></div>
+    <div class="pad">
+      <span class="kicker">Prozessfluss · Process Flow</span>
+      <h2>Von der Opportunity bis zum Abschluss</h2>
+      <div class="legend">
+        <span class="lg"><span class="sw R"></span>Responsible</span>
+        <span class="lg"><span class="sw A"></span>Accountable</span>
+        <span class="lg"><span class="sw C"></span>Consulted</span>
+        <span class="lg"><span class="sw I"></span>Informed</span>
+        <span class="lg" style="margin-left:auto;color:#8a93a4">R/A je Schritt — Hauptverantwortung hervorgehoben</span>
+      </div>
+      <div class="pipe">
+        <div class="phase">Identify &amp; Qualify</div>
+        <div class="node"><span class="idx">01</span><span class="nm">Start</span><span class="raci"><span class="tag R">Seller</span><span class="tag A">Sales Mgr</span></span></div>
+        <div class="node"><span class="idx">02</span><span class="nm">Go / No-Go</span><span class="raci"><span class="tag R">Seller</span><span class="tag A">Sales Mgr</span></span></div>
+        <div class="node"><span class="idx">03</span><span class="nm">Create</span><span class="raci"><span class="tag R">Seller</span><span class="tag A">Seller</span></span></div>
+        <div class="node"><span class="idx">04</span><span class="nm">Kickoff</span><span class="raci"><span class="tag R">Estimator</span><span class="tag A">Seller</span></span></div>
+        <div class="node"><span class="idx">05</span><span class="nm">Technical Solution</span><span class="raci"><span class="tag R">Estimator</span><span class="tag A">Seller</span></span></div>
+
+        <div class="phase">Calculate &amp; Source</div>
+        <div class="node"><span class="idx">06</span><span class="nm">Commercial</span><span class="raci"><span class="tag R">Seller</span><span class="tag A">Sales Mgr</span></span></div>
+        <div class="node"><span class="idx">07</span><span class="nm">Labor Calculation</span><span class="raci"><span class="tag R">Estimator</span><span class="tag A">Est. Mgr</span></span></div>
+        <div class="node"><span class="idx">08</span><span class="nm">Subcontracting</span><span class="raci"><span class="tag R">Procmt</span><span class="tag A">Estimator</span></span></div>
+        <div class="node"><span class="idx">09</span><span class="nm">JCI Equipment</span><span class="raci"><span class="tag R">Estimator</span><span class="tag A">JCI GP</span></span></div>
+        <div class="node"><span class="idx">10</span><span class="nm">3rd Party Equip.</span><span class="raci"><span class="tag R">Offshore</span><span class="tag A">Est. Mgr</span></span></div>
+        <div class="node"><span class="idx">11</span><span class="nm">Service</span><span class="raci"><span class="tag R">Svc Seller</span><span class="tag A">Estimator</span></span></div>
+
+        <div class="phase">Review · Approve · Win</div>
+        <div class="node"><span class="idx">12</span><span class="nm">OPS Review</span><span class="raci"><span class="tag R">Seller</span><span class="tag A">Sales Mgr</span></span></div>
+        <div class="node"><span class="idx">13</span><span class="nm">QARF</span><span class="raci"><span class="tag R">Seller</span><span class="tag A">Sales Mgr</span></span></div>
+        <div class="node"><span class="idx">14</span><span class="nm">DoA</span><span class="raci"><span class="tag R">Seller</span><span class="tag A">Sales Mgr</span></span></div>
+        <div class="node"><span class="idx">15</span><span class="nm">Present Quote</span><span class="raci"><span class="tag R">Seller</span><span class="tag A">Sales Mgr</span></span></div>
+        <div class="node"><span class="idx">16</span><span class="nm">Negotiate</span><span class="raci"><span class="tag R">Seller</span><span class="tag A">Sales Mgr</span></span></div>
+        <div class="node"><span class="idx">17</span><span class="nm">Close (Booking)</span><span class="raci"><span class="tag R">Seller</span><span class="tag A">Sales Mgr</span></span></div>
+        <div class="node" style="grid-column:span 1"><span class="idx">18</span><span class="nm">Post Mortem</span><span class="raci"><span class="tag R">Seller</span><span class="tag A">Sales Mgr</span></span></div>
+      </div>
+      <div class="foot">
+        <span>Quelle: Sales_Process_RACI_Matrix_1.xlsx — Blatt „RACI Matrix“</span>
+        <span class="pagepill">02 / 03</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 3 ===================== -->
+  <section class="slide">
+    <div class="bar"></div>
+    <div class="pad">
+      <span class="kicker">Substanz &amp; Steuerung · Content &amp; Governance</span>
+      <h2>Was das Dokument liefert</h2>
+      <div class="grid3">
+        <div class="card">
+          <h4><span class="ic">①</span>Klarheit je Schritt</h4>
+          <ul>
+            <li>Zweck, Ablauf und Schnittstellen pro Prozessschritt</li>
+            <li>R · A · C · I für alle 17 Rollen zugeordnet</li>
+            <li>Attribute: Standardisierung, Durchlaufzeit (W), Aufwand (C), Tools</li>
+            <li>Begriffe exakt aus der Excel-Matrix übernommen</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4><span class="ic">②</span>Governance &amp; Compliance</h4>
+          <ul>
+            <li>DoA-Schwellen: &lt; 100k USD Freigabe · &gt; 1 Mio. USD Brief-it</li>
+            <li>Mind. zwei Subunternehmen — sonst MBE-Prozess</li>
+            <li>Prime-Revenue-Programm für alle Subunternehmen</li>
+            <li>4I-/Vier-Augen-Prinzip vor Angebot &amp; Abschluss</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4><span class="ic">③</span>Format &amp; Nutzung</h4>
+          <ul>
+            <li>Zweisprachig DE / EN — für Dritte verständlich</li>
+            <li>Word (.docx) &amp; Markdown — versioniert im Repository</li>
+            <li>Teilbar gemeinsam mit der Excel-Matrix</li>
+            <li>Status TBD — bereit zur gemeinsamen Abstimmung</li>
+          </ul>
+        </div>
+      </div>
+      <div class="ribbon">
+        <div class="rb"><div class="n">18</div><div class="l">Schritte dokumentiert</div></div>
+        <div class="rb"><div class="n">100 %</div><div class="l">RACI-Abdeckung</div></div>
+        <div class="rb"><div class="n">2</div><div class="l">Sprachen DE / EN</div></div>
+        <div class="rb"><div class="n">2</div><div class="l">Formate Word + MD</div></div>
+      </div>
+      <div class="foot">
+        <span>Nächster Schritt: gemeinsame Review &amp; Freigabe des Status</span>
+        <span class="pagepill">03 / 03</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
